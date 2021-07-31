@@ -2,12 +2,14 @@ import * as React from "react";
 import { useKey } from "rooks";
 
 import Cell from "./Cell";
+import Grid from "./Grid";
+import Walls from "./Walls";
 
 type FieldProps = {
   columnNumber?: number;
 };
 
-type SelectedCell = {
+export type SelectedCell = {
   x: number;
   y: number;
 };
@@ -23,6 +25,18 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
 
   const grid: number[][] = new Array(rowNumber).fill(
     new Array(columnNumber).fill(0)
+  );
+
+  const walls = React.useMemo(
+    () => ({
+      vertical: Array.from({ length: rowNumber }, () =>
+        Array.from({ length: columnNumber - 1 }, () => Math.random() > 0.5)
+      ),
+      horizontal: Array.from({ length: rowNumber - 1 }, () =>
+        Array.from({ length: columnNumber }, () => Math.random() > 0.5)
+      ),
+    }),
+    [columnNumber, rowNumber]
   );
 
   const [selectedCell, setSelectedCell] = React.useState<SelectedCell>({
@@ -72,22 +86,22 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
   return (
     <div className="bg-gray-700">
       <svg width={width} height={height}>
-        {grid.map((row, rowIdx) =>
-          row.map((column, columnIdx) => (
-            <Cell
-              key={`${rowIdx}-${columnIdx}`}
-              x={columnIdx * cellSize}
-              y={rowIdx * cellSize}
-              cellSize={cellSize}
-              selected={
-                selectedCell?.x === columnIdx && selectedCell?.y === rowIdx
-              }
-              setSelectedCell={() =>
-                setSelectedCell({ x: columnIdx, y: rowIdx })
-              }
-            />
-          ))
-        )}
+        <Grid
+          grid={grid}
+          cellSize={cellSize}
+          selectedCell={selectedCell}
+          setSelectedCell={setSelectedCell}
+        />
+        <Walls
+          walls={walls.vertical}
+          cellSize={cellSize}
+          direction="vertical"
+        />
+        <Walls
+          walls={walls.horizontal}
+          cellSize={cellSize}
+          direction="horizontal"
+        />
       </svg>
     </div>
   );
