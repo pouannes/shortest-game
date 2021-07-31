@@ -13,14 +13,16 @@ const Cell = ({
   selected,
   setSelectedCell,
 }: CellProps): JSX.Element => {
+  const selectedColor = "#8B5CF6";
   return (
     <rect
       x={x}
       y={y}
       width={cellSize}
       height={cellSize}
-      stroke="#E5E7EB"
-      fill={selected ? "#047857" : "#374151"}
+      stroke={selected ? selectedColor : "#6B7280"}
+      fill={selected ? selectedColor : "#374151"}
+      strokeWidth={2}
       onClick={setSelectedCell}
     />
   );
