@@ -14,10 +14,24 @@ export type SelectedCell = {
   y: number;
 };
 
+type walls = {
+  vertical: boolean[][];
+  horizontal: boolean[][];
+};
+
 type Direction = "up" | "down" | "left" | "right";
 
 const height = 400;
 const width = 800;
+
+const getRandomWalls = (rowNumber: number, columnNumber: number) => ({
+  vertical: Array.from({ length: rowNumber }, () =>
+    Array.from({ length: columnNumber - 1 }, () => Math.random() > 0.5)
+  ),
+  horizontal: Array.from({ length: rowNumber - 1 }, () =>
+    Array.from({ length: columnNumber }, () => Math.random() > 0.5)
+  ),
+});
 
 const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
   const cellSize = width / columnNumber;
@@ -27,17 +41,11 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
     new Array(columnNumber).fill(0)
   );
 
-  const walls = React.useMemo(
-    () => ({
-      vertical: Array.from({ length: rowNumber }, () =>
-        Array.from({ length: columnNumber - 1 }, () => Math.random() > 0.5)
-      ),
-      horizontal: Array.from({ length: rowNumber - 1 }, () =>
-        Array.from({ length: columnNumber }, () => Math.random() > 0.5)
-      ),
-    }),
-    [columnNumber, rowNumber]
-  );
+  const [walls, setWalls] = React.useState<walls | null>(null);
+
+  React.useEffect(() => {
+    setWalls(getRandomWalls(rowNumber, columnNumber));
+  }, [columnNumber, rowNumber]);
 
   const [selectedCell, setSelectedCell] = React.useState<SelectedCell>({
     x: Math.round(columnNumber / 2),
@@ -46,45 +54,73 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
 
   const move = React.useCallback(
     (direction: Direction) => {
+      let hasWall;
+
+      if (walls === null) {
+        return;
+      }
+
       switch (direction) {
         case "up":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            y: Math.max(0, prevPos.y - 1),
-          }));
+          hasWall =
+            selectedCell.y === 0 ||
+            walls.horizontal[selectedCell.y - 1][selectedCell.x];
+          !hasWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              y: Math.max(0, prevPos.y - 1),
+            }));
           break;
         case "down":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            y: Math.min(rowNumber - 1, prevPos.y + 1),
-          }));
+          hasWall =
+            selectedCell.y === rowNumber - 1 ||
+            walls.horizontal[selectedCell.y][selectedCell.x];
+          !hasWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              y: Math.min(rowNumber - 1, prevPos.y + 1),
+            }));
           break;
         case "right":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            x: Math.min(columnNumber - 1, prevPos.x + 1),
-          }));
+          hasWall =
+            selectedCell.x === columnNumber - 1 ||
+            walls.vertical[selectedCell.y][selectedCell.x];
+          !hasWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              x: Math.min(columnNumber - 1, prevPos.x + 1),
+            }));
           break;
         case "left":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            x: Math.max(0, prevPos.x - 1),
-          }));
+          hasWall =
+            selectedCell.x === 0 ||
+            walls.vertical[selectedCell.y][selectedCell.x - 1];
+          !hasWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              x: Math.max(0, prevPos.x - 1),
+            }));
           break;
         default:
           break;
       }
     },
-    [columnNumber, rowNumber]
+    [columnNumber, rowNumber, selectedCell, walls]
   );
 
-  useKey(["ArrowUp"], () => move("up"));
-  useKey(["ArrowDown"], () => move("down"));
-  useKey(["ArrowRight"], () => move("right"));
-  useKey(["ArrowLeft"], () => move("left"));
+  useKey(["ArrowUp", "w"], () => move("up"));
+  useKey(["ArrowDown", "s"], () => move("down"));
+  useKey(["ArrowRight", "d"], () => move("right"));
+  useKey(["ArrowLeft", "a"], () => move("left"));
 
   return (
-    <div className="bg-gray-700">
+    <div className="relative bg-gray-700">
+      <button
+        className="absolute left-0 p-3 bg-gray-400 rounded-md -top-20 "
+        onClick={() => setWalls(getRandomWalls(rowNumber, columnNumber))}
+      >
+        Randomize walls
+      </button>
       <svg width={width} height={height}>
         <Grid
           grid={grid}
@@ -92,16 +128,21 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
           selectedCell={selectedCell}
           setSelectedCell={setSelectedCell}
         />
-        <Walls
-          walls={walls.vertical}
-          cellSize={cellSize}
-          direction="vertical"
-        />
-        <Walls
-          walls={walls.horizontal}
-          cellSize={cellSize}
-          direction="horizontal"
-        />
+        {walls !== null ? (
+          <>
+            {" "}
+            <Walls
+              walls={walls.vertical}
+              cellSize={cellSize}
+              direction="vertical"
+            />
+            <Walls
+              walls={walls.horizontal}
+              cellSize={cellSize}
+              direction="horizontal"
+            />
+          </>
+        ) : null}
       </svg>
     </div>
   );

@@ -40,13 +40,15 @@ type WallProps = {
 };
 
 const Wall = ({ x, y, cellSize, isWall, direction }: WallProps) => {
+  const strokeWidth = 2;
   return (
     <line
-      x1={x}
-      y1={y}
-      x2={direction === "vertical" ? x : x + cellSize}
-      y2={direction === "vertical" ? y + cellSize : y}
-      stroke={isWall ? "#FECACA" : "#6B7280"}
+      x1={direction === "vertical" ? x : x - strokeWidth / 2}
+      y1={direction === "vertical" ? y - strokeWidth / 2 : y}
+      x2={direction === "vertical" ? x : x + cellSize + strokeWidth / 2}
+      y2={direction === "vertical" ? y + cellSize + strokeWidth / 2 : y}
+      stroke={isWall ? "#FECACA" : "transparent"}
+      strokeWidth={strokeWidth}
     />
   );
 };
