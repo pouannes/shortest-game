@@ -44,3 +44,15 @@ export const increaseGridSize = (grid: Grid) => {
     return [columnNoRight, columnSecond];
   });
 };
+
+export const countVisitedCells = (grid: Grid) => {
+  return grid.reduce(
+    (acc, currColumn) =>
+      acc +
+      currColumn.reduce(
+        (acc, currCell) => (currCell.cellStatus === "visited" ? acc + 1 : acc),
+        0
+      ),
+    0
+  );
+};

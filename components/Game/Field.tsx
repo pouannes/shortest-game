@@ -12,7 +12,7 @@ import depthSearchGenerator from "@/lib/depthSearchGenerator";
 
 import _ from "lodash";
 import { useKey } from "rooks";
-import { increaseGridSize } from "@/lib/utils";
+import { countVisitedCells, increaseGridSize } from "@/lib/utils";
 
 type FieldProps = {
   columnNumber?: number;
@@ -61,7 +61,7 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
     columnNumber,
   });
 
-  // initialize maze
+  // initialize both maze
   React.useEffect(() => {
     const smallHumanGrid = generateMaze({
       x: 0,
@@ -130,26 +130,10 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
   // trigger computer move when human discovers a new cell
   const prevNumberHumanVisitedCells = React.useRef<number>(1);
   React.useEffect(() => {
-    const numberHumanVisitedCells = humanGrid?.reduce(
-      (acc, currColumn) =>
-        acc +
-        currColumn.reduce(
-          (acc, currCell) =>
-            currCell.cellStatus === "visited" ? acc + 1 : acc,
-          0
-        ),
-      0
-    );
-    const numberComputerVisitedCells = computerGrid?.reduce(
-      (acc, currColumn) =>
-        acc +
-        currColumn.reduce(
-          (acc, currCell) =>
-            currCell.cellStatus === "visited" ? acc + 1 : acc,
-          0
-        ),
-      0
-    );
+    const numberHumanVisitedCells = humanGrid && countVisitedCells(humanGrid);
+    const numberComputerVisitedCells =
+      computerGrid && countVisitedCells(computerGrid);
+
     if (
       typeof numberComputerVisitedCells === "number" &&
       typeof numberHumanVisitedCells === "number"
