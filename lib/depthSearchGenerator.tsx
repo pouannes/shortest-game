@@ -22,7 +22,6 @@ function* depthSearchGenerator({ x, y, grid }: GenerateMaze) {
       grid[currentCell.x][currentCell.y].cellStatus === "unvisited"
     ) {
       grid[currentCell.x][currentCell.y].cellStatus = "visited";
-      console.log(grid);
       yield grid;
 
       directions.forEach((direction) => {

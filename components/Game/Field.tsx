@@ -11,6 +11,8 @@ import useMove from "./useMove";
 import depthSearchGenerator from "@/lib/depthSearchGenerator";
 
 import _ from "lodash";
+import { useKey } from "rooks";
+import { increaseGridSize } from "@/lib/utils";
 
 type FieldProps = {
   columnNumber?: number;
@@ -52,11 +54,26 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
 
   useMove({ grid, selectedCell, setSelectedCell, rowNumber, columnNumber });
 
+  const handleNextComputerMove = () => {
+    // if there's still cells to visit
+    if (
+      grid?.some((column) =>
+        column.some((cell) => cell.cellStatus !== "visited")
+      )
+    ) {
+      setGrid(_.clone(generator?.next()?.value));
+    }
+  };
+
   // initialize maze
   React.useEffect(() => {
-    setGrid(
-      generateMaze({ x: 0, y: 0, grid: getBaseGrid(rowNumber, columnNumber) })
-    );
+    const smallGrid = generateMaze({
+      x: 0,
+      y: 0,
+      grid: getBaseGrid(rowNumber / 2, columnNumber / 2),
+    });
+
+    setGrid(increaseGridSize(smallGrid));
     setSelectedCell({
       x: Math.round(columnNumber / 2),
       y: Math.round(rowNumber / 2) - 1,
@@ -80,6 +97,7 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
     );
   }, [selectedCell]);
 
+  // set up generator for AI
   const [generator, setGenerator] = React.useState<Generator<GridType> | null>(
     null
   );
@@ -94,6 +112,8 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
       );
     }
   }, [columnNumber, generator, grid, rowNumber]);
+
+  useKey(["n"], handleNextComputerMove);
 
   return (
     <div className="relative bg-gray-800 border-2 border-gray-700 rounded-md">
@@ -113,7 +133,7 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
       </button>
       <button
         className="absolute right-0 p-3 bg-gray-400 rounded-md -top-20"
-        onClick={() => setGrid(_.clone(generator?.next()?.value))}
+        onClick={handleNextComputerMove}
       >
         Next step
       </button>

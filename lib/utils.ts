@@ -27,3 +27,20 @@ export const isCellAccessible = (
 export const isCoordinateWithinBounds = (x: number, y: number, grid: Grid) => {
   return x >= 0 && x <= grid.length - 1 && y >= 0 && y <= grid[x].length - 1;
 };
+
+// this is always x2 but it can be refactored to work with arbitrary factors
+export const increaseGridSize = (grid: Grid) => {
+  return grid.flatMap((column) => {
+    const columnNoRight = column.flatMap((cell) => {
+      return [
+        { ...cell, rightWall: false, bottomWall: false },
+        { ...cell, rightWall: false },
+      ];
+    });
+    const columnSecond = column.flatMap((cell) => {
+      return [{ ...cell, bottomWall: false }, cell];
+    });
+
+    return [columnNoRight, columnSecond];
+  });
+};
