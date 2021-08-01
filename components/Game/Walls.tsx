@@ -49,7 +49,7 @@ const Wall = ({ x, y, cellSize, direction }: WallProps) => {
       y1={direction === "vertical" ? y - strokeWidth / 2 : y}
       x2={direction === "vertical" ? x : x + cellSize + strokeWidth / 2}
       y2={direction === "vertical" ? y + cellSize + strokeWidth / 2 : y}
-      stroke={"#FECACA"}
+      stroke={"#2563EB"}
       strokeWidth={strokeWidth}
     />
   );

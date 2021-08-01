@@ -4,6 +4,7 @@ import { useKey } from "rooks";
 import Cell from "./Cell";
 import Grid from "./Grid";
 import Walls from "./Walls";
+import SelectedCell from "./SelectedCell";
 import GridType from "@/types/Grid";
 import generateMaze, { DX, DY } from "@/lib/generateMaze";
 
@@ -46,10 +47,11 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
 
   const [grid, setGrid] = React.useState<GridType | null>(null);
 
+  // initialize maze
   React.useEffect(() => {
-    const baseGrid = getBaseGrid(rowNumber, columnNumber);
-    console.log(generateMaze({ x: 0, y: 0, grid: baseGrid }));
-    setGrid(baseGrid);
+    setGrid(
+      generateMaze({ x: 0, y: 0, grid: getBaseGrid(rowNumber, columnNumber) })
+    );
   }, [columnNumber, rowNumber]);
 
   const [selectedCell, setSelectedCell] = React.useState<SelectedCell>({
@@ -119,10 +121,18 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
   useKey(["ArrowLeft", "a"], () => move("left"));
 
   return (
-    <div className="relative bg-gray-700">
+    <div className="relative bg-gray-800 border-2 border-gray-700 rounded-md">
       <button
-        className="absolute left-0 p-3 bg-gray-400 rounded-md -top-20 "
-        onClick={() => setGrid(getBaseGrid(rowNumber, columnNumber))}
+        className="absolute left-0 p-3 bg-gray-400 rounded-md -top-20"
+        onClick={() =>
+          setGrid(
+            generateMaze({
+              x: 0,
+              y: 0,
+              grid: getBaseGrid(rowNumber, columnNumber),
+            })
+          )
+        }
       >
         Randomize walls
       </button>
@@ -132,10 +142,14 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
             <Grid
               grid={grid}
               cellSize={cellSize}
-              selectedCell={selectedCell}
               setSelectedCell={setSelectedCell}
             />
-            <Walls grid={grid} cellSize={cellSize} />{" "}
+            <Walls grid={grid} cellSize={cellSize} />
+            <SelectedCell
+              x={selectedCell.x}
+              y={selectedCell.y}
+              cellSize={cellSize}
+            />
           </>
         ) : null}
       </svg>

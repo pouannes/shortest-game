@@ -5,11 +5,10 @@ import { SelectedCell } from "./Field";
 type GridProps = {
   grid: GridType;
   cellSize: number;
-  selectedCell: SelectedCell;
   setSelectedCell: ({ x, y }: SelectedCell) => void;
 };
 
-const Grid = ({ grid, cellSize, selectedCell, setSelectedCell }: GridProps) => {
+const Grid = ({ grid, cellSize, setSelectedCell }: GridProps) => {
   return (
     <>
       {grid.map((column, columnIdx) =>
@@ -19,9 +18,6 @@ const Grid = ({ grid, cellSize, selectedCell, setSelectedCell }: GridProps) => {
             x={columnIdx * cellSize}
             y={rowIdx * cellSize}
             cellSize={cellSize}
-            selected={
-              selectedCell?.x === columnIdx && selectedCell?.y === rowIdx
-            }
             setSelectedCell={() => setSelectedCell({ x: columnIdx, y: rowIdx })}
           />
         ))

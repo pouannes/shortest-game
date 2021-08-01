@@ -2,28 +2,24 @@ type CellProps = {
   x: number;
   y: number;
   cellSize: number;
-  selected?: boolean;
   setSelectedCell: () => void;
 };
 
-const Cell = ({
-  x,
-  y,
-  cellSize,
-  selected,
-  setSelectedCell,
-}: CellProps): JSX.Element => {
-  const selectedColor = "#8B5CF6";
+const Cell = ({ x, y, cellSize, setSelectedCell }: CellProps): JSX.Element => {
+  const selectedColor = "#9CA3AF";
+  const factor = 2;
   return (
     <rect
       x={x}
       y={y}
       width={cellSize}
       height={cellSize}
-      stroke={selected ? selectedColor : "#6B7280"}
-      fill={selected ? selectedColor : "#374151"}
+      stroke={"#374151"}
+      fill={"#1F2937"}
       strokeWidth={2}
       onClick={setSelectedCell}
+      rx={"0"}
+      ry={"0"}
     />
   );
 };
