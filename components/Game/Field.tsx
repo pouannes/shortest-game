@@ -18,8 +18,8 @@ type FieldProps = {
   columnNumber?: number;
 };
 
-const height = 400;
-const width = 800;
+const height = 270;
+const width = 720;
 
 const getBaseGrid = (rowNumber: number, columnNumber: number): GridType => {
   const grid = Array.from({ length: columnNumber }, () =>
@@ -44,6 +44,9 @@ const getBaseGrid = (rowNumber: number, columnNumber: number): GridType => {
 };
 
 const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
+  // there's some magic left to figure out on the relationship between width,
+  // height, columnNumber and cellSize, so that everything fits well.
+  // Good luck future me
   const cellSize = width / columnNumber;
   const rowNumber = Math.floor(height / cellSize);
 
@@ -155,26 +158,7 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="relative bg-gray-800 border-2 border-gray-700 rounded-md">
-        {/* <button
-          className="absolute left-0 p-3 bg-gray-400 rounded-md -top-20"
-          onClick={() =>
-            setHumanGrid(
-              generateMaze({
-                x: 0,
-                y: 0,
-                grid: getBaseGrid(rowNumber, columnNumber),
-              })
-            )
-          }
-        >
-          Randomize walls
-        </button>
-        <button
-          className="absolute right-0 p-3 bg-gray-400 rounded-md -top-20"
-          onClick={handleNextComputerMove}
-        >
-          Next step
-        </button> */}
+        <p className="absolute left-0 text-lg text-gray-400 -top-9">You</p>
         <svg width={width} height={height}>
           {humanGrid !== null ? (
             <>
@@ -195,7 +179,11 @@ const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
           ) : null}
         </svg>
       </div>
-      <div className="relative mt-4 bg-gray-800 border-2 border-gray-700 rounded-md">
+      <div className="relative mt-16 bg-gray-800 border-2 border-gray-700 rounded-md">
+        <p className="absolute left-0 text-lg text-gray-400 -top-9">
+          The computer (different grid)
+        </p>
+
         <svg width={width} height={height}>
           {computerGrid !== null ? (
             <>

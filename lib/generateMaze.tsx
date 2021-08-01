@@ -34,6 +34,8 @@ const carveBetweenCell = (
   }
 };
 
+// some code duplication here with the search generator, but I think it's not
+// worth the effort to get rid of it
 const generateMaze = ({ x, y, grid }: GenerateMaze) => {
   const randDirection = _.shuffle<Direction>(directions);
 
