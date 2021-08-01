@@ -1,45 +1,48 @@
+import * as React from "react";
+import { Grid } from "./Field";
+
 type WallsProps = {
-  walls: boolean[][];
+  grid: Grid;
   cellSize: number;
-  direction: "horizontal" | "vertical";
 };
 
-const Walls = ({ walls, cellSize, direction }: WallsProps) => {
-  return (
+const Walls = ({ grid, cellSize }: WallsProps) => {
+  return grid ? (
     <>
-      {walls.map((row, rowIdx) =>
-        row.map((isWall, columnIdx) => (
-          <Wall
-            key={`${rowIdx}-${columnIdx}`}
-            x={
-              direction === "horizontal"
-                ? columnIdx * cellSize
-                : columnIdx * cellSize + cellSize
-            }
-            y={
-              direction === "vertical"
-                ? rowIdx * cellSize
-                : rowIdx * cellSize + cellSize
-            }
-            isWall={isWall}
-            cellSize={cellSize}
-            direction={direction}
-          />
+      {grid.map((column, columnIdx) =>
+        column.map((cell, rowIdx) => (
+          <React.Fragment key={`${columnIdx}-${rowIdx}`}>
+            {cell.bottomWall ? (
+              <Wall
+                x={columnIdx * cellSize}
+                y={rowIdx * cellSize + cellSize}
+                cellSize={cellSize}
+                direction={"horizontal"}
+              />
+            ) : null}
+            {cell.rightWall ? (
+              <Wall
+                x={columnIdx * cellSize + cellSize}
+                y={rowIdx * cellSize}
+                cellSize={cellSize}
+                direction={"vertical"}
+              />
+            ) : null}
+          </React.Fragment>
         ))
       )}
     </>
-  );
+  ) : null;
 };
 
 type WallProps = {
   x: number;
   y: number;
   cellSize: number;
-  isWall: boolean;
   direction: "horizontal" | "vertical";
 };
 
-const Wall = ({ x, y, cellSize, isWall, direction }: WallProps) => {
+const Wall = ({ x, y, cellSize, direction }: WallProps) => {
   const strokeWidth = 2;
   return (
     <line
@@ -47,7 +50,7 @@ const Wall = ({ x, y, cellSize, isWall, direction }: WallProps) => {
       y1={direction === "vertical" ? y - strokeWidth / 2 : y}
       x2={direction === "vertical" ? x : x + cellSize + strokeWidth / 2}
       y2={direction === "vertical" ? y + cellSize + strokeWidth / 2 : y}
-      stroke={isWall ? "#FECACA" : "transparent"}
+      stroke={"#FECACA"}
       strokeWidth={strokeWidth}
     />
   );

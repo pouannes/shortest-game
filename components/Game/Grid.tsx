@@ -1,8 +1,8 @@
 import Cell from "./Cell";
-import { SelectedCell } from "./Field";
+import { Grid as GridType, SelectedCell } from "./Field";
 
 type GridProps = {
-  grid: number[][];
+  grid: GridType;
   cellSize: number;
   selectedCell: SelectedCell;
   setSelectedCell: ({ x, y }: SelectedCell) => void;
@@ -11,10 +11,10 @@ type GridProps = {
 const Grid = ({ grid, cellSize, selectedCell, setSelectedCell }: GridProps) => {
   return (
     <>
-      {grid.map((row, rowIdx) =>
-        row.map((column, columnIdx) => (
+      {grid.map((column, columnIdx) =>
+        column.map((row, rowIdx) => (
           <Cell
-            key={`${rowIdx}-${columnIdx}`}
+            key={`${columnIdx}-${rowIdx}`}
             x={columnIdx * cellSize}
             y={rowIdx * cellSize}
             cellSize={cellSize}
