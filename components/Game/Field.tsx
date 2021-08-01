@@ -8,6 +8,9 @@ import GridCell from "@/types/GridCell";
 import generateMaze from "@/lib/generateMaze";
 import SelectedCellType from "@/types/SelectedCell";
 import useMove from "./useMove";
+import depthSearchGenerator from "@/lib/depthSearchGenerator";
+
+import _ from "lodash";
 
 type FieldProps = {
   columnNumber?: number;
@@ -38,7 +41,7 @@ const getBaseGrid = (rowNumber: number, columnNumber: number): GridType => {
   );
 };
 
-const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
+const Field = ({ columnNumber = 16 }: FieldProps): JSX.Element => {
   const cellSize = width / columnNumber;
   const rowNumber = Math.floor(height / cellSize);
 
@@ -77,6 +80,21 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
     );
   }, [selectedCell]);
 
+  const [generator, setGenerator] = React.useState<Generator<GridType> | null>(
+    null
+  );
+  React.useEffect(() => {
+    if (grid && !generator) {
+      setGenerator(
+        depthSearchGenerator({
+          x: Math.round(columnNumber / 2),
+          y: Math.round(rowNumber / 2) - 1,
+          grid: _.clone(grid),
+        })
+      );
+    }
+  }, [columnNumber, generator, grid, rowNumber]);
+
   return (
     <div className="relative bg-gray-800 border-2 border-gray-700 rounded-md">
       <button
@@ -92,6 +110,12 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
         }
       >
         Randomize walls
+      </button>
+      <button
+        className="absolute right-0 p-3 bg-gray-400 rounded-md -top-20"
+        onClick={() => setGrid(_.clone(generator?.next()?.value))}
+      >
+        Next step
       </button>
       <svg width={width} height={height}>
         {grid !== null ? (

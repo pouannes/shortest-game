@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DX, DY } from "@/lib/generateMaze";
+import { DX, DY } from "@/lib/utils";
 import Direction from "@/types/Direction";
 import GridType from "@/types/Grid";
 import SelectedCell from "@/types/SelectedCell";

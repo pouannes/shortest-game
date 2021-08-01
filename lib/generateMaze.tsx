@@ -1,7 +1,9 @@
+import Direction from "@/types/Direction";
 import Grid from "@/types/Grid";
 import GridCell from "@/types/GridCell";
 
 import _ from "lodash";
+import { DX, DY } from "./utils";
 
 type GenerateMaze = {
   x: number;
@@ -9,14 +11,7 @@ type GenerateMaze = {
   grid: Grid;
 };
 
-type Direction = "up" | "down" | "right" | "left";
-
 const directions: Direction[] = ["up", "down", "right", "left"];
-
-export const DY = (val: number, direction: Direction) =>
-  direction === "up" ? val - 1 : direction === "down" ? val + 1 : val;
-export const DX = (val: number, direction: Direction) =>
-  direction === "right" ? val + 1 : direction === "left" ? val - 1 : val;
 
 const carveBetweenCell = (
   cell1: GridCell,

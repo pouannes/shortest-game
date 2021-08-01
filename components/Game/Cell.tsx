@@ -22,7 +22,7 @@ const Cell = ({
       width={cellSize}
       height={cellSize}
       stroke={"#4B5563"}
-      fill={status === "visited" ? "#374151" : "#111827"}
+      fill={status === "visited" ? "#252C37" : "#111827"}
       strokeWidth={2}
       onClick={setSelectedCell}
     />
