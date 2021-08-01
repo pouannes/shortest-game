@@ -1,5 +1,6 @@
+import GridType from "@/types/Grid";
 import Cell from "./Cell";
-import { Grid as GridType, SelectedCell } from "./Field";
+import { SelectedCell } from "./Field";
 
 type GridProps = {
   grid: GridType;

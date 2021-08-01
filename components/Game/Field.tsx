@@ -4,6 +4,8 @@ import { useKey } from "rooks";
 import Cell from "./Cell";
 import Grid from "./Grid";
 import Walls from "./Walls";
+import GridType from "@/types/Grid";
+import generateMaze, { DX, DY } from "@/lib/generateMaze";
 
 type FieldProps = {
   columnNumber?: number;
@@ -14,20 +16,12 @@ export type SelectedCell = {
   y: number;
 };
 
-type GridCell = {
-  cell: number;
-  bottomWall: boolean;
-  rightWall: boolean;
-};
-
-export type Grid = GridCell[][];
-
 type Direction = "up" | "down" | "left" | "right";
 
 const height = 400;
 const width = 800;
 
-const getRandomGrid = (rowNumber: number, columnNumber: number) => {
+const getBaseGrid = (rowNumber: number, columnNumber: number) => {
   const grid = Array.from({ length: columnNumber }, () =>
     Array.from({ length: rowNumber }, () => ({
       cell: 0,
@@ -50,10 +44,12 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
   const cellSize = width / columnNumber;
   const rowNumber = Math.floor(height / cellSize);
 
-  const [grid, setGrid] = React.useState<Grid | null>(null);
+  const [grid, setGrid] = React.useState<GridType | null>(null);
 
   React.useEffect(() => {
-    setGrid(getRandomGrid(rowNumber, columnNumber));
+    const baseGrid = getBaseGrid(rowNumber, columnNumber);
+    console.log(generateMaze({ x: 0, y: 0, grid: baseGrid }));
+    setGrid(baseGrid);
   }, [columnNumber, rowNumber]);
 
   const [selectedCell, setSelectedCell] = React.useState<SelectedCell>({
@@ -63,42 +59,58 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
 
   const move = React.useCallback(
     (direction: Direction) => {
-      let hasWall;
-
       if (grid === null) {
+        return;
+      }
+
+      const { x, y } = selectedCell;
+      const newX = DX(x, direction);
+      const newY = DY(y, direction);
+
+      if (
+        newX < 0 ||
+        newX > grid.length - 1 ||
+        newY < 0 ||
+        newY > grid[newX].length - 1 ||
+        grid[newX][newY].cell === 0
+      ) {
         return;
       }
 
       switch (direction) {
         case "up":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            y: Math.max(0, prevPos.y - 1),
-          }));
+          !grid[newX][newY].bottomWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              y: Math.max(0, prevPos.y - 1),
+            }));
           break;
         case "down":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            y: Math.min(rowNumber - 1, prevPos.y + 1),
-          }));
+          !grid[x][y].bottomWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              y: Math.min(rowNumber - 1, prevPos.y + 1),
+            }));
           break;
         case "right":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            x: Math.min(columnNumber - 1, prevPos.x + 1),
-          }));
+          !grid[x][y].rightWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              x: Math.min(columnNumber - 1, prevPos.x + 1),
+            }));
           break;
         case "left":
-          setSelectedCell((prevPos) => ({
-            ...prevPos,
-            x: Math.max(0, prevPos.x - 1),
-          }));
+          !grid[newX][newY].rightWall &&
+            setSelectedCell((prevPos) => ({
+              ...prevPos,
+              x: Math.max(0, prevPos.x - 1),
+            }));
           break;
         default:
           break;
       }
     },
-    [columnNumber, rowNumber, grid]
+    [grid, selectedCell, rowNumber, columnNumber]
   );
 
   useKey(["ArrowUp", "w"], () => move("up"));
@@ -110,7 +122,7 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
     <div className="relative bg-gray-700">
       <button
         className="absolute left-0 p-3 bg-gray-400 rounded-md -top-20 "
-        onClick={() => setGrid(getRandomGrid(rowNumber, columnNumber))}
+        onClick={() => setGrid(getBaseGrid(rowNumber, columnNumber))}
       >
         Randomize walls
       </button>

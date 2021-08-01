@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Grid } from "./Field";
-
+import { Grid } from "@/types/Grid";
 type WallsProps = {
   grid: Grid;
   cellSize: number;
