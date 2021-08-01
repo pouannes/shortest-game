@@ -9,7 +9,7 @@ const SelectedCell = ({ x, y, cellSize }: SelectedCellProps) => {
     <circle
       cx={x * cellSize + cellSize / 2}
       cy={y * cellSize + cellSize / 2}
-      r={15}
+      r={(cellSize / 2) * 0.6}
       fill="#9CA3AF"
     />
   );

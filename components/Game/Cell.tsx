@@ -1,25 +1,30 @@
+import CellStatus from "@/types/CellStatus";
+
 type CellProps = {
   x: number;
   y: number;
+  status: CellStatus;
   cellSize: number;
   setSelectedCell: () => void;
 };
 
-const Cell = ({ x, y, cellSize, setSelectedCell }: CellProps): JSX.Element => {
-  const selectedColor = "#9CA3AF";
-  const factor = 2;
+const Cell = ({
+  x,
+  y,
+  status,
+  cellSize,
+  setSelectedCell,
+}: CellProps): JSX.Element => {
   return (
     <rect
       x={x}
       y={y}
       width={cellSize}
       height={cellSize}
-      stroke={"#374151"}
-      fill={"#1F2937"}
+      stroke={"#4B5563"}
+      fill={status === "visited" ? "#374151" : "#111827"}
       strokeWidth={2}
       onClick={setSelectedCell}
-      rx={"0"}
-      ry={"0"}
     />
   );
 };

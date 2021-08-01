@@ -52,10 +52,10 @@ const generateMaze = ({ x, y, grid }: GenerateMaze) => {
       newX <= grid.length - 1 &&
       newY >= 0 &&
       newY <= grid[newX].length - 1 &&
-      grid[newX][newY].cell === 0
+      grid[newX][newY].cellStatus === "init"
     ) {
       carveBetweenCell(grid[x][y], grid[newX][newY], direction);
-      grid[newX][newY].cell = 1;
+      grid[newX][newY].cellStatus = "unvisited";
       return generateMaze({ x: newX, y: newY, grid });
     }
   });

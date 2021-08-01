@@ -1,34 +1,31 @@
 import * as React from "react";
-import { useKey } from "rooks";
 
-import Cell from "./Cell";
 import Grid from "./Grid";
 import Walls from "./Walls";
 import SelectedCell from "./SelectedCell";
 import GridType from "@/types/Grid";
-import generateMaze, { DX, DY } from "@/lib/generateMaze";
+import GridCell from "@/types/GridCell";
+import generateMaze from "@/lib/generateMaze";
+import SelectedCellType from "@/types/SelectedCell";
+import useMove from "./useMove";
 
 type FieldProps = {
   columnNumber?: number;
 };
 
-export type SelectedCell = {
-  x: number;
-  y: number;
-};
-
-type Direction = "up" | "down" | "left" | "right";
-
 const height = 400;
 const width = 800;
 
-const getBaseGrid = (rowNumber: number, columnNumber: number) => {
+const getBaseGrid = (rowNumber: number, columnNumber: number): GridType => {
   const grid = Array.from({ length: columnNumber }, () =>
-    Array.from({ length: rowNumber }, () => ({
-      cell: 0,
-      bottomWall: true,
-      rightWall: true,
-    }))
+    Array.from(
+      { length: rowNumber },
+      (): GridCell => ({
+        cellStatus: "init",
+        bottomWall: true,
+        rightWall: true,
+      })
+    )
   );
 
   // remove walls on the far left and bottom
@@ -47,78 +44,38 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
 
   const [grid, setGrid] = React.useState<GridType | null>(null);
 
+  const [selectedCell, setSelectedCell] =
+    React.useState<SelectedCellType | null>(null);
+
+  useMove({ grid, selectedCell, setSelectedCell, rowNumber, columnNumber });
+
   // initialize maze
   React.useEffect(() => {
     setGrid(
       generateMaze({ x: 0, y: 0, grid: getBaseGrid(rowNumber, columnNumber) })
     );
+    setSelectedCell({
+      x: Math.round(columnNumber / 2),
+      y: Math.round(rowNumber / 2) - 1,
+    });
   }, [columnNumber, rowNumber]);
 
-  const [selectedCell, setSelectedCell] = React.useState<SelectedCell>({
-    x: Math.round(columnNumber / 2),
-    y: Math.round(rowNumber / 2) - 1,
-  });
-
-  const move = React.useCallback(
-    (direction: Direction) => {
-      if (grid === null) {
-        return;
-      }
-
-      const { x, y } = selectedCell;
-      const newX = DX(x, direction);
-      const newY = DY(y, direction);
-
-      if (
-        newX < 0 ||
-        newX > grid.length - 1 ||
-        newY < 0 ||
-        newY > grid[newX].length - 1 ||
-        grid[newX][newY].cell === 0
-      ) {
-        return;
-      }
-
-      switch (direction) {
-        case "up":
-          !grid[newX][newY].bottomWall &&
-            setSelectedCell((prevPos) => ({
-              ...prevPos,
-              y: Math.max(0, prevPos.y - 1),
-            }));
-          break;
-        case "down":
-          !grid[x][y].bottomWall &&
-            setSelectedCell((prevPos) => ({
-              ...prevPos,
-              y: Math.min(rowNumber - 1, prevPos.y + 1),
-            }));
-          break;
-        case "right":
-          !grid[x][y].rightWall &&
-            setSelectedCell((prevPos) => ({
-              ...prevPos,
-              x: Math.min(columnNumber - 1, prevPos.x + 1),
-            }));
-          break;
-        case "left":
-          !grid[newX][newY].rightWall &&
-            setSelectedCell((prevPos) => ({
-              ...prevPos,
-              x: Math.max(0, prevPos.x - 1),
-            }));
-          break;
-        default:
-          break;
-      }
-    },
-    [grid, selectedCell, rowNumber, columnNumber]
-  );
-
-  useKey(["ArrowUp", "w"], () => move("up"));
-  useKey(["ArrowDown", "s"], () => move("down"));
-  useKey(["ArrowRight", "d"], () => move("right"));
-  useKey(["ArrowLeft", "a"], () => move("left"));
+  // mark the cell as visited when selectedCell moves
+  React.useEffect(() => {
+    setGrid((prevGrid) =>
+      prevGrid
+        ? prevGrid.map((column, columnIdx) =>
+            columnIdx === selectedCell?.x
+              ? column.map((cell, rowIdx) =>
+                  rowIdx === selectedCell?.y
+                    ? { ...cell, cellStatus: "visited" }
+                    : cell
+                )
+              : column
+          )
+        : prevGrid
+    );
+  }, [selectedCell]);
 
   return (
     <div className="relative bg-gray-800 border-2 border-gray-700 rounded-md">
@@ -145,11 +102,13 @@ const Field = ({ columnNumber = 20 }: FieldProps): JSX.Element => {
               setSelectedCell={setSelectedCell}
             />
             <Walls grid={grid} cellSize={cellSize} />
-            <SelectedCell
-              x={selectedCell.x}
-              y={selectedCell.y}
-              cellSize={cellSize}
-            />
+            {selectedCell ? (
+              <SelectedCell
+                x={selectedCell.x}
+                y={selectedCell.y}
+                cellSize={cellSize}
+              />
+            ) : null}
           </>
         ) : null}
       </svg>

@@ -1,5 +1,7 @@
+import CellStatus from "./CellStatus";
+
 type GridCell = {
-  cell: number;
+  cellStatus: CellStatus;
   bottomWall: boolean;
   rightWall: boolean;
 };

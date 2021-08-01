@@ -11,7 +11,10 @@ const Walls = ({ grid, cellSize }: WallsProps) => {
       {grid.map((column, columnIdx) =>
         column.map((cell, rowIdx) => (
           <React.Fragment key={`${columnIdx}-${rowIdx}`}>
-            {cell.bottomWall ? (
+            {cell.bottomWall &&
+            (cell.cellStatus === "visited" ||
+              grid[columnIdx][Math.min(grid[columnIdx].length - 1, rowIdx + 1)]
+                .cellStatus === "visited") ? (
               <Wall
                 x={columnIdx * cellSize}
                 y={rowIdx * cellSize + cellSize}
@@ -19,7 +22,10 @@ const Walls = ({ grid, cellSize }: WallsProps) => {
                 direction={"horizontal"}
               />
             ) : null}
-            {cell.rightWall ? (
+            {cell.rightWall &&
+            (cell.cellStatus === "visited" ||
+              grid[Math.min(grid.length - 1, columnIdx + 1)][rowIdx]
+                .cellStatus === "visited") ? (
               <Wall
                 x={columnIdx * cellSize + cellSize}
                 y={rowIdx * cellSize}
